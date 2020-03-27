@@ -1,6 +1,7 @@
 package jobshop;
 
 import jobshop.encodings.JobNumbers;
+import jobshop.encodings.ResourceOrder;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -17,6 +18,8 @@ public class DebuggingMain {
             // Note : cette solution a aussi été vue dans les exercices (section 3.3)
             //        mais on commençait à compter à 1 ce qui donnait [1 2 2 1 1 2]
             JobNumbers enc = new JobNumbers(instance);
+
+
             enc.jobs[enc.nextToSet++] = 0;
             enc.jobs[enc.nextToSet++] = 1;
             enc.jobs[enc.nextToSet++] = 1;
@@ -38,5 +41,29 @@ public class DebuggingMain {
             System.exit(1);
         }
 
+        try {
+            // load the aaa1 instance
+            Instance instance = Instance.fromFile(Paths.get("instances/aaa1"));
+
+            ResourceOrder rso = new ResourceOrder(instance);
+
+
+            rso.addTask(0,0,0);
+            rso.addTask(0,1,1);
+            rso.addTask(1,1,0);
+            rso.addTask(1,0,1);
+            rso.addTask(2,0,2);
+            rso.addTask(2,1,2);
+
+            Schedule s = rso.toSchedule();
+
+            System.out.println("SCHEDULE: " + s);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        }
     }
-}
+

@@ -60,6 +60,24 @@ public class Schedule {
         return max;
     }
 
+    public String toString() {
+        String s ="";
+        int nb_rows = times.length;
+        int nb_col = times[0].length;
+        for(int i =0;i<nb_rows;i++){
+            s = s + "\nJob " + i +" :\n";
+            for(int j=0; j<nb_col;j++){
+                s = s + "task " + j + " : ";
+                s = s + String.valueOf(startTime(i,j));
+                if(j!=nb_col-1){
+                    s = s + " | ";
+                }
+            }
+
+        }
+        return (s);
+    }
+
     public Schedule copy() {
         return new Schedule(this.pb, this.times);
     }

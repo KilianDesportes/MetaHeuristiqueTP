@@ -30,11 +30,15 @@ public class DebuggingMain {
             System.out.println("\nENCODING: " + enc);
 
             Schedule sched = enc.toSchedule();
-            // TODO: make it print something meaningful
-            // by implementing the toString() method
             System.out.println("SCHEDULE: " + sched);
             System.out.println("VALID: " + sched.isValid());
             System.out.println("MAKESPAN: " + sched.makespan());
+
+
+            JobNumbers enc2 = enc.fromSchedule(sched);
+
+            Schedule sched2 = enc2.toSchedule();
+            System.out.println("SCHEDULE sched2 : " + sched2);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -57,7 +61,14 @@ public class DebuggingMain {
 
             Schedule s = rso.toSchedule();
 
-            System.out.println("SCHEDULE: " + s);
+            System.out.println("SCHEDULE s : " + s);
+
+            ResourceOrder rso2 = rso.fromSchedule(s);
+
+            Schedule s2 = rso2.toSchedule();
+
+            System.out.println("SCHEDULE s2: " + s2);
+
 
         } catch (IOException e) {
             e.printStackTrace();

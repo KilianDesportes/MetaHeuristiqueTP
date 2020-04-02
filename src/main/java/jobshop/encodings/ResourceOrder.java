@@ -4,6 +4,7 @@ import jobshop.Encoding;
 import jobshop.Instance;
 import jobshop.Schedule;
 
+import java.time.format.ResolverStyle;
 import java.util.Arrays;
 
 public class ResourceOrder extends Encoding {
@@ -32,15 +33,6 @@ public class ResourceOrder extends Encoding {
     @Override
     public Schedule toSchedule() {
 
-        // time at which each machine is going to be freed
-        int[] nextFreeTimeResource = new int[instance.numMachines];
-
-        // for each job, the first task that has not yet been scheduled
-        int[] nextTask = new int[instance.numJobs];
-
-        int[] taskDone = new int[instance.numTasks];
-
-        // for each task, its start time
         int[][] startTimes = new int[instance.numJobs][instance.numTasks];
 
         for (int i = 0; i < instance.numMachines; i++) {
@@ -68,11 +60,11 @@ public class ResourceOrder extends Encoding {
                 int currentJob = ressourcesOrderTab[i][j].job;
                 int currentTask = ressourcesOrderTab[i][j].task;
 
-                int timeToFinish =  instance.duration(currentJob, currentTask);
+                int timeToFinish = instance.duration(currentJob, currentTask);
 
 
-                int jobBefore = ressourcesOrderTab[i][(j-1)].job;
-                int taskBefore = ressourcesOrderTab[i][(j-1)].task;
+                int jobBefore = ressourcesOrderTab[i][(j - 1)].job;
+                int taskBefore = ressourcesOrderTab[i][(j - 1)].task;
 
                 int durationTaskBefore = instance.duration(jobBefore, taskBefore);
 
@@ -92,8 +84,8 @@ public class ResourceOrder extends Encoding {
                 System.out.println("currentStart : " + currentStart );
                 System.out.println("endOfTaskBefore : " + endOfTaskBefore );
                 */
-                
-                if(currentStart < endOfTaskBefore){
+
+                if (currentStart < endOfTaskBefore) {
                     int gap = endOfTaskBefore - startTimes[currentJob][currentTask];
                     startTimes[currentJob][currentTask] = endOfTaskBefore;
 
@@ -108,5 +100,17 @@ public class ResourceOrder extends Encoding {
 
     }
 
+    public ResourceOrder fromSchedule(Schedule sched) {
 
+        ResourceOrder rso = new ResourceOrder(this.instance);
+
+            for (int j = 0 ; j < instance.numJobs; j++) {
+                for (int k = 0; k < instance.numTasks; k++) {
+                    rso.addTask(instance.machine(j,k),j,k);
+                }
+            }
+
+        return rso;
+
+    }
 }

@@ -50,6 +50,43 @@ public class JobNumbers extends Encoding {
         return new Schedule(instance, startTimes);
     }
 
+    public JobNumbers fromSchedule(Schedule sched) {
+
+        JobNumbers jbn = new JobNumbers(this.instance);
+
+        int JobOrder[][] = new int[instance.numMachines][instance.numJobs];
+
+        for (int m = 0 ; m < instance.numMachines; m++) {
+            for (int j = 0; j < instance.numJobs; j++) {
+                //jbn.jobs[jbn.nextToSet++] = k;
+                int t = instance.task_with_machine(j,m);
+                JobOrder[m][j] =j;
+            }
+        }
+
+        for (int m = 0 ; m < instance.numMachines; m++) {
+            for (int j = 0; j < instance.numJobs-1; j++) {
+                //jbn.jobs[jbn.nextToSet++] = k;
+                int j2 = j+1;
+                int t = instance.task_with_machine(j,m);
+                int t2 = instance.task_with_machine(j2,m);
+                if(sched.startTime(j,t) > sched.startTime(j+1,t2)){
+                    JobOrder[m][j] = j2;
+                    JobOrder[m][j2] = j;
+                }
+            }
+        }
+
+        for (int m = 0 ; m < instance.numMachines; m++) {
+            for (int j = 0; j < instance.numJobs; j++) {
+                jbn.jobs[jbn.nextToSet++] = JobOrder[m][j];
+            }
+        }
+
+        return jbn;
+
+    }
+
     @Override
     public String toString() {
         return Arrays.toString(Arrays.copyOfRange(jobs,0, nextToSet));

@@ -308,6 +308,8 @@ public class GreedySolver implements Solver {
                     }
                 }
             }
+
+
             int timeToEnd[] = new int[instance.numJobs];
 
             for (int i = 0; i < instance.numJobs; i++) {
@@ -358,7 +360,7 @@ public class GreedySolver implements Solver {
 
                     if(startTimes[currentJob][currentTask] == best_startTime){
 
-                        if (instance.duration(shortest) > instance.duration(current)) {
+                        if (instance.duration(shortest) < instance.duration(current)) {
                             index_shortest = k;
                         }
 

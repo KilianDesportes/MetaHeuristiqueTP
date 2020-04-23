@@ -2,9 +2,12 @@ package jobshop.solvers;
 
 import jobshop.Instance;
 import jobshop.Result;
+import jobshop.Schedule;
 import jobshop.Solver;
 import jobshop.encodings.ResourceOrder;
+import jobshop.encodings.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DescentSolver implements Solver {
@@ -74,12 +77,32 @@ public class DescentSolver implements Solver {
 
     @Override
     public Result solve(Instance instance, long deadline) {
-        throw new UnsupportedOperationException();
+
+        ResourceOrder rso = new ResourceOrder(instance);
+
+        this.blocksOfCriticalPath(rso);
+
+        return null;
     }
 
     /** Returns a list of all blocks of the critical path. */
     List<Block> blocksOfCriticalPath(ResourceOrder order) {
-        throw new UnsupportedOperationException();
+
+        GreedySolver grSol = new GreedySolver();
+
+        grSol.setPriority(1);
+
+        Result R = grSol.solve(order.instance,10000);
+
+        Schedule sch = R.schedule;
+
+        List<Task> listTask = sch.criticalPath();
+
+        for(int i = 0 ; i<listTask.size() ;i++){
+            System.out.println(listTask.get(i));
+        }
+
+        return null;
     }
 
     /** For a given block, return the possible swaps for the Nowicki and Smutnicki neighborhood */

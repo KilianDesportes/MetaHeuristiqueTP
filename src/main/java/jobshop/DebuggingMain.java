@@ -14,14 +14,13 @@ public class DebuggingMain {
     public static void main(String[] args) {
         try {
             // load the aaa1 instance (others : ft06 / ft10 / ft20 )
-            Instance instance = Instance.fromFile(Paths.get("instances/aaa1"));
+            Instance instance = Instance.fromFile(Paths.get("instances/ft06"));
 
             DescentSolver dsSolv = new DescentSolver();
 
+            Result r = dsSolv.solve(instance,10000);
 
-
-            dsSolv.solve(instance,10000);
-
+            System.out.println("Makespan = " + r.schedule.makespan());
 
         } catch (IOException e) {
             e.printStackTrace();

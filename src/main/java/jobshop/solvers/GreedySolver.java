@@ -11,12 +11,14 @@ import jobshop.encodings.ResourceOrder;
 import jobshop.encodings.Task;
 
 import java.time.format.ResolverStyle;
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class GreedySolver implements Solver {
 
     ResourceOrder rso;
 
-    int priorityRule;
+    int priorityRule = -1;
 
     //1 = SPT = donne priorité à la tâche la plus courte
     //2 = LPT =  donne priorité à la tâche la plus longue
@@ -30,6 +32,10 @@ public class GreedySolver implements Solver {
 
     public void setPriority(int prio) {
         priorityRule = prio;
+    }
+
+    public int getPriority(){
+        return priorityRule;
     }
 
     @Override
@@ -218,99 +224,99 @@ public class GreedySolver implements Solver {
 
         } else if (priorityRule == 5) { //EST_SPT
 
-
-            //CALCUL DES DATES DE DEBUT
-            int startTimes[][] = new int[instance.numJobs][instance.numTasks];
+            int startTimes[] = new int[instance.numJobs];
 
             for (int i = 0; i < instance.numJobs; i++) {
-                for (int j = 0; j < instance.numTasks; j++) {
-                    if(j==0){
-                        startTimes[i][j] = 0;
-                    }else{
-                        startTimes[i][j] = startTimes[i][j-1] + instance.duration(i,j-1);
-                    }
-                }
+                startTimes[i] = 0;
             }
+
+            int machineTime [] = new int[instance.numMachines];
+            Arrays.fill(machineTime,0);
 
             //Boucle
             while (al_Task_Realisables.size() > 0 && (deadline - System.currentTimeMillis() > 1)) {
 
-                int index_shortest = 0;
-
                 int startTime;
+                int best_startTime = -1;
 
-                int best_startTime = 0;
+                Task next = null;
 
-                //calcul du startTime le plus court
+                int duration = 0;
+
+                ArrayList<Task> taskTemporaire = new ArrayList<Task>();
+
+                //Calcul du meilleur startTime + ajout des tâches dans la liste TaskTemporaire
                 for (int k = 0; k < al_Task_Realisables.size(); k++) {
 
                     Task current = al_Task_Realisables.get(k);
                     int currentJob = current.job;
                     int currentTask = current.task;
 
-                    startTime = startTimes[currentJob][currentTask];
+                    if(best_startTime==-1){
+                        best_startTime = Math.max(startTimes[currentJob],machineTime[instance.machine(current)]);
+                        taskTemporaire.add(current);
 
-                    if(k==0){
-                        best_startTime = startTime;
-                    }else {
-                        if (best_startTime > startTime) {
+                    }else{
+                        startTime = Math.max(startTimes[currentJob],machineTime[instance.machine(current)]);
+                        if(startTime == best_startTime){
+                            taskTemporaire.add(current);
+                        }
+                        if(startTime < best_startTime){
+                            taskTemporaire.clear();
+                            taskTemporaire.add(current);
                             best_startTime = startTime;
                         }
                     }
                 }
 
-                for (int k = 0; k < al_Task_Realisables.size(); k++) {
+                int shortestDuration = -1;
 
-                    Task current = al_Task_Realisables.get(k);
+                for (int k = 0; k < taskTemporaire.size(); k++) {
+
+                    Task current = taskTemporaire.get(k);
                     int currentJob = current.job;
                     int currentTask = current.task;
 
-                    if(startTimes[currentJob][currentTask] == best_startTime){
-
-                        Task shortest = al_Task_Realisables.get(index_shortest);
-
-                        if (instance.duration(shortest) > instance.duration(current)) {
-                            index_shortest = k;
+                    if(shortestDuration == -1){
+                        shortestDuration = instance.duration(current);
+                        next = current;
+                    }else{
+                        duration = instance.duration(current);
+                        if(duration < shortestDuration){
+                            next = current;
+                            shortestDuration = duration;
                         }
-
                     }
+
                 }
 
-                Task shortest = al_Task_Realisables.get(index_shortest);
+                int job = next.job;
+                int task = next.task;
 
-                int job = shortest.job;
-                int task = shortest.task;
 
-                int resource = instance.machine(job, task);
+                machineTime[instance.machine(next)] = best_startTime + instance.duration(next);
+                al_Task_Realisables.remove(next);
 
-                rso.addTask(resource, job, task);
-
-                al_Task_Realisables.remove(index_shortest);
-
-                if (instance.numTasks - 1 > task) {
+                if (task != (instance.numTasks-1)) {
+                    startTimes[job] = best_startTime + instance.duration(job,task);
                     al_Task_Realisables.add(new Task(job, task + 1));
                 }
+
+                rso.addTask(instance.machine(job,task), job, task);
 
 
             }
 
         }else if (priorityRule == 6) { //EST_LRPT
 
-            //CALCUL DES DATES DE DEBUT
-            int startTimes[][] = new int[instance.numJobs][instance.numTasks];
-
-            for (int i = 0; i < instance.numJobs; i++) {
-                for (int j = 0; j < instance.numTasks; j++) {
-                    if (j == 0) {
-                        startTimes[i][j] = 0;
-                    } else {
-                        startTimes[i][j] = startTimes[i][j - 1] + instance.duration(i, j - 1);
-                    }
-                }
-            }
-
+            int startTimes[] = new int[instance.numJobs];
 
             int timeToEnd[] = new int[instance.numJobs];
+
+            for (int i = 0; i < instance.numJobs; i++) {
+                startTimes[i] = 0;
+            }
+
 
             for (int i = 0; i < instance.numJobs; i++) {
                 timeToEnd[i] = 0;
@@ -319,69 +325,73 @@ public class GreedySolver implements Solver {
                 }
             }
 
+            int machineTime [] = new int[instance.numMachines];
+            Arrays.fill(machineTime,0);
 
 
-
-            //Boucle
-            while (al_Task_Realisables.size() > 0 && (deadline - System.currentTimeMillis() > 1)) {
-
-                int index_shortest = 0;
+            while (!al_Task_Realisables.isEmpty() && (deadline - System.currentTimeMillis() > 1)) {
 
                 int startTime;
+                int best_startTime = -1;
 
-                int best_startTime = 0;
+                Task next = null;
 
-                //calcul du startTime le plus court
+                int duration = 0;
+
+                ArrayList<Task> taskTemporaire = new ArrayList<Task>();
+
+                //Calcul du meilleur startTime
                 for (int k = 0; k < al_Task_Realisables.size(); k++) {
 
                     Task current = al_Task_Realisables.get(k);
                     int currentJob = current.job;
                     int currentTask = current.task;
 
-                    startTime = startTimes[currentJob][currentTask];
+                    if(best_startTime==-1){
+                        best_startTime = Math.max(startTimes[currentJob],machineTime[instance.machine(current)]);
+                        taskTemporaire.add(current);
 
-                    if(k==0){
-                        best_startTime = startTime;
-                    }else {
-                        if (best_startTime > startTime) {
+                    }else{
+                        startTime = Math.max(startTimes[currentJob],machineTime[instance.machine(current)]);
+                        if(startTime == best_startTime){
+                            taskTemporaire.add(current);
+                        }
+                        if(startTime < best_startTime){
+                            taskTemporaire.clear();
+                            taskTemporaire.add(current);
                             best_startTime = startTime;
                         }
                     }
                 }
 
-                for (int k = 0; k < al_Task_Realisables.size(); k++) {
-
-                    Task current = al_Task_Realisables.get(k);
+                for (int k = 0; k < taskTemporaire.size(); k++) {
+                    Task current = taskTemporaire.get(k);
                     int currentJob = current.job;
                     int currentTask = current.task;
 
-                    Task shortest = al_Task_Realisables.get(index_shortest);
-                    int jobShortest = shortest.job;
-
-                    if(startTimes[currentJob][currentTask] == best_startTime){
-
-                        if (instance.duration(shortest) < instance.duration(current)) {
-                            index_shortest = k;
-                        }
-
+                    if(next == null){
+                        next = current;
+                        duration = timeToEnd[currentJob];
+                    }else if(duration < timeToEnd[currentJob]){
+                        next = current;
+                        duration = timeToEnd[currentJob];
                     }
                 }
 
-                Task shortest = al_Task_Realisables.get(index_shortest);
 
-                int job = shortest.job;
-                int task = shortest.task;
+                int job = next.job;
+                int task = next.task;
 
-                int resource = instance.machine(job, task);
+                timeToEnd[job] -= instance.duration(job,task);
+                machineTime[instance.machine(next)] = best_startTime + instance.duration(next);
+                al_Task_Realisables.remove(next);
 
-                rso.addTask(resource, job, task);
-
-                al_Task_Realisables.remove(index_shortest);
-                timeToEnd[job] -= instance.duration(job, task);
-
-                if (instance.numTasks - 1 > task) {
+                if (task != (instance.numTasks-1)) {
+                    startTimes[job] = best_startTime + instance.duration(job,task);
                     al_Task_Realisables.add(new Task(job, task + 1));
                 }
+
+                rso.addTask(instance.machine(job,task), job, task);
 
             }
         }

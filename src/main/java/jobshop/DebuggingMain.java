@@ -2,6 +2,7 @@ package jobshop;
 
 import jobshop.encodings.JobNumbers;
 import jobshop.encodings.ResourceOrder;
+import jobshop.encodings.Task;
 import jobshop.solvers.DescentSolver;
 import jobshop.solvers.GreedySolver;
 
@@ -13,14 +14,17 @@ public class DebuggingMain {
 
     public static void main(String[] args) {
         try {
-            // load the aaa1 instance (others : ft06 / ft10 / ft20 )
-            Instance instance = Instance.fromFile(Paths.get("instances/ft06"));
+            // load instance (aaaa1 / ft06 / ft10 / ft20 )
+            Instance instance = Instance.fromFile(Paths.get("instances/ft20"));
 
             DescentSolver dsSolv = new DescentSolver();
 
+            dsSolv.setGreedyPrio(6);
+
             Result r = dsSolv.solve(instance,10000);
 
-            System.out.println("Makespan = " + r.schedule.makespan());
+            System.out.println("Makespan final = " + r.schedule.makespan());
+
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -14,6 +14,8 @@ import java.util.*;
 
 public class DescentSolver implements Solver {
 
+    GreedySolver solverGreedy = new GreedySolver();
+
     /**
      * A block represents a subsequence of the critical path such that all tasks in it execute on the same machine.
      * This class identifies a block in a ResourceOrder representation.
@@ -95,12 +97,21 @@ public class DescentSolver implements Solver {
     }
 
 
+    public void setGreedyPrio(int i){
+
+        solverGreedy.setPriority(i);
+
+    }
+
+
     @Override
     public Result solve(Instance instance, long deadline) {
 
-        GreedySolver solverGreedy = new GreedySolver();
+        deadline = deadline + System.currentTimeMillis();
 
-        solverGreedy.setPriority(1);
+        if(solverGreedy.getPriority() == -1){
+            solverGreedy.setPriority(1);
+        }
 
         Result r = solverGreedy.solve(instance, deadline);
 
@@ -111,11 +122,12 @@ public class DescentSolver implements Solver {
 
         boolean newVoisin = true;
 
-        while (newVoisin == true) {
+        while (newVoisin == true && (deadline - System.currentTimeMillis() > 1)) {
 
             newVoisin=false;
 
             ResourceOrder temp = optimalRso.copy();
+
 
             List<Swap> alSwap = new ArrayList<>();
             List<Block> alBlock = this.blocksOfCriticalPath(temp);
@@ -125,20 +137,28 @@ public class DescentSolver implements Solver {
 
             for (int i = 0; i < alSwap.size(); i++) {
 
-                alSwap.get(i).applyOn(temp);
+                ResourceOrder current = temp.copy();
 
-                int makespanCurrent = temp.toSchedule().makespan();
+                Schedule sch = current.toSchedule();
 
-                if (optimalMakespan > makespanCurrent) {
-                    optimalRso = temp;
-                    optimalMakespan = makespanCurrent;
-                    newVoisin=true;
+                alSwap.get(i).applyOn(current);
+
+                Schedule newSch = current.toSchedule();
+
+                if(newSch != null){
+
+                    int makespanCurrent = newSch.makespan();
+
+                    if (optimalMakespan > makespanCurrent) {
+                        optimalRso = current;
+                        optimalMakespan = makespanCurrent;
+                        newVoisin=true;
+                    }
                 }
 
+
             }
-
         }
-
 
         return new Result(instance, optimalRso.toSchedule(), Result.ExitCause.Blocked);
     }

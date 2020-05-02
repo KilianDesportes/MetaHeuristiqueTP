@@ -88,8 +88,11 @@ public class ResourceOrder extends Encoding {
                     .findFirst(); // select the first one if any
 
             if(schedulable.isPresent()) {
+
                 // we found a schedulable task, lets call it t
+
                 Task t = schedulable.get();
+
                 int machine = instance.machine(t.job, t.task);
 
                 // compute the earliest start time (est) of the task

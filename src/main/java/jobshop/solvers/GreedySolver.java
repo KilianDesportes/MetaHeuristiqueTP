@@ -41,6 +41,10 @@ public class GreedySolver implements Solver {
     @Override
     public Result solve(Instance instance, long deadline) {
 
+        if(this.priorityRule == -1){
+            this.priorityRule = 6;
+        }
+
         ArrayList<Task> al_Task_Realisables = new ArrayList();
 
         deadline = deadline + System.currentTimeMillis();
@@ -49,11 +53,7 @@ public class GreedySolver implements Solver {
 
         //Init
         for (int j = 0; j < instance.numJobs; j++) {
-            for (int t = 1; t < instance.numTasks; t++) {
-                if (t == 1) {
-                    al_Task_Realisables.add(new Task(j, t - 1));
-                }
-            }
+            al_Task_Realisables.add(new Task(j, 0));
         }
 
         if (priorityRule == 1) { //SPT

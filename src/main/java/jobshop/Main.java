@@ -22,8 +22,14 @@ public class Main {
     private static HashMap<String, Solver> solvers;
     static {
         solvers = new HashMap<>();
-        solvers.put("basic", new BasicSolver());
-        solvers.put("random", new RandomSolver());
+        GreedySolver gs = new GreedySolver();
+        GreedySolver gs2 = new GreedySolver();
+        gs2.setPriority(1);
+        DescentSolver dsSolve = new DescentSolver();
+        solvers.put("SPT", gs2);
+        solvers.put("ESP_LRPT", gs);
+        solvers.put("Descent", dsSolve);
+        solvers.put("Tabou", new TabouSolver());
         // add new solvers here
     }
 

@@ -5,6 +5,8 @@ import jobshop.Result;
 import jobshop.Schedule;
 import jobshop.Solver;
 import jobshop.solvers.BasicSolver;
+import jobshop.solvers.DescentSolver;
+import jobshop.solvers.TabouSolver;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -70,6 +72,106 @@ public class EncodingTests {
 
         assert result.schedule.isValid();
         assert result.schedule.makespan() == sched.makespan(); // should have the same makespan
+    }
+
+    @Test
+    public void testDescentSolver() throws IOException {
+        Instance instance = Instance.fromFile(Paths.get("instances/ft06"));
+
+        DescentSolver dsSolv = new DescentSolver();
+
+        dsSolv.setGreedyPrio(6);
+
+        Result r = dsSolv.solve(instance,1000);
+
+        assert r.schedule.isValid();
+        assert r.schedule.makespan() <= 61;
+
+        instance = Instance.fromFile(Paths.get("instances/ft10"));
+
+        r = dsSolv.solve(instance,1000);
+
+        assert r.schedule.isValid();
+        assert r.schedule.makespan() <= 1108;
+
+        instance = Instance.fromFile(Paths.get("instances/ft20"));
+
+        r = dsSolv.solve(instance,1000);
+
+        assert r.schedule.isValid();
+        assert r.schedule.makespan() <= 1501;
+
+        instance = Instance.fromFile(Paths.get("instances/la02"));
+
+        r = dsSolv.solve(instance,1000);
+
+        assert r.schedule.isValid();
+        assert r.schedule.makespan() <= 817;
+
+        instance = Instance.fromFile(Paths.get("instances/la08"));
+
+        r = dsSolv.solve(instance,1000);
+
+        assert r.schedule.isValid();
+        assert r.schedule.makespan() <= 939;
+
+    }
+
+    @Test
+    public void testTabouSolver() throws IOException {
+        Instance instance = Instance.fromFile(Paths.get("instances/ft06"));
+
+        TabouSolver dsSolv = new TabouSolver();
+
+        dsSolv.setGreedyPrio(6);
+
+        Result r = dsSolv.solve(instance,1000);
+
+        assert r.schedule.isValid();
+        assert r.schedule.makespan() <= 55;
+
+        instance = Instance.fromFile(Paths.get("instances/ft10"));
+
+        r = dsSolv.solve(instance,1000);
+
+        assert r.schedule.isValid();
+        assert r.schedule.makespan() <= 1015;
+
+        instance = Instance.fromFile(Paths.get("instances/ft20"));
+
+        r = dsSolv.solve(instance,1000);
+
+        assert r.schedule.isValid();
+        assert r.schedule.makespan() <= 1331;
+
+        instance = Instance.fromFile(Paths.get("instances/la02"));
+
+        r = dsSolv.solve(instance,1000);
+
+        assert r.schedule.isValid();
+        assert r.schedule.makespan() <= 737;
+
+        instance = Instance.fromFile(Paths.get("instances/la03"));
+
+        r = dsSolv.solve(instance,1000);
+
+        assert r.schedule.isValid();
+        assert r.schedule.makespan() <= 632;
+
+        instance = Instance.fromFile(Paths.get("instances/la04"));
+
+        r = dsSolv.solve(instance,1000);
+
+        assert r.schedule.isValid();
+        assert r.schedule.makespan() <= 638;
+
+        instance = Instance.fromFile(Paths.get("instances/la08"));
+
+        r = dsSolv.solve(instance,1000);
+
+        assert r.schedule.isValid();
+        assert r.schedule.makespan() <= 898;
+
     }
 
 }

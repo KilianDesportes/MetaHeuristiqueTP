@@ -98,9 +98,7 @@ public class DescentSolver implements Solver {
 
 
     public void setGreedyPrio(int i){
-
         solverGreedy.setPriority(i);
-
     }
 
 
@@ -110,7 +108,7 @@ public class DescentSolver implements Solver {
         deadline = deadline + System.currentTimeMillis();
 
         if(solverGreedy.getPriority() == -1){
-            solverGreedy.setPriority(1);
+            this.setGreedyPrio(6);
         }
 
         Result r = solverGreedy.solve(instance, deadline);
@@ -128,6 +126,7 @@ public class DescentSolver implements Solver {
 
             ResourceOrder temp = optimalRso.copy();
 
+            //System.out.println("after copy : " + temp.toSchedule().makespan());
 
             List<Swap> alSwap = new ArrayList<>();
             List<Block> alBlock = this.blocksOfCriticalPath(temp);
@@ -138,16 +137,34 @@ public class DescentSolver implements Solver {
             for (int i = 0; i < alSwap.size(); i++) {
 
                 ResourceOrder current = temp.copy();
+                
+                /*System.out.println("____New iteration_____");
+
+                System.out.println("\nOrdre des tâches : \n" + current);*/
 
                 Schedule sch = current.toSchedule();
 
+                /*System.out.println("Sch valid before apply on ? " + sch.isValid());
+                System.out.println("Makespan ? " + sch.makespan());
+
+                System.out.println("Swap sur machine : " + alSwap.get(i).machine);
+                System.out.println("Tache 1 : " + alSwap.get(i).t1);
+                System.out.println("Tache 2 : " + alSwap.get(i).t2);*/
+
                 alSwap.get(i).applyOn(current);
+
+                //System.out.println("\nNouvel ordre des tâches : \n" + current);
 
                 Schedule newSch = current.toSchedule();
 
                 if(newSch != null){
+                    /*System.out.println("Sch valid before apply on ? " + newSch.isValid());
+                    System.out.println("Makespan ? " + newSch.makespan());*/
 
                     int makespanCurrent = newSch.makespan();
+
+                    /*System.out.println("Current = " + makespanCurrent);
+                    System.out.println("Optimal = " + optimalMakespan);*/
 
                     if (optimalMakespan > makespanCurrent) {
                         optimalRso = current;
@@ -255,12 +272,19 @@ public class DescentSolver implements Solver {
 
         //System.out.println("Machine " + machine + " lastTask " + lastTask);
 
-        for (int i = firstTask; i < lastTask; i++) {
+        if(lastTask-firstTask == 1){
+            alSwap.add(new Swap(machine,lastTask,firstTask));
+        }else{
+            alSwap.add(new Swap(machine,firstTask,firstTask+1));
+            alSwap.add(new Swap(machine,lastTask-1,lastTask));
+        }
+
+        /*for(int i = firstTask; i < lastTask; i++) {
             for (int j = i + 1; j <= lastTask; j++) {
                 alSwap.add(new Swap(machine, i, j));
                 // System.out.println("Swap between " + i + " and " + j );
             }
-        }
+        }*/
 
         return alSwap;
     }

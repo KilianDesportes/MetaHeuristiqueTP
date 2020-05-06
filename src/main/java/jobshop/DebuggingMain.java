@@ -5,6 +5,7 @@ import jobshop.encodings.ResourceOrder;
 import jobshop.encodings.Task;
 import jobshop.solvers.DescentSolver;
 import jobshop.solvers.GreedySolver;
+import jobshop.solvers.TabouSolver;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -14,17 +15,16 @@ public class DebuggingMain {
 
     public static void main(String[] args) {
         try {
-            // load instance (aaaa1 / ft06 / ft10 / ft20 )
+            // load instance (aaa1 / ft06 / ft10 / ft20 )
             Instance instance = Instance.fromFile(Paths.get("instances/ft20"));
 
-            DescentSolver dsSolv = new DescentSolver();
+            TabouSolver dsSolv = new TabouSolver();
 
-            dsSolv.setGreedyPrio(6);
+            Result r = dsSolv.solve(instance,1000);
 
-            Result r = dsSolv.solve(instance,10000);
+            int result = r.schedule.makespan();
 
-            System.out.println("Makespan final = " + r.schedule.makespan());
-
+            System.out.println("ft20 | 1331 | Makespan final = " + result );
 
         } catch (IOException e) {
             e.printStackTrace();

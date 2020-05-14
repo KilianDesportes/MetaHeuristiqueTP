@@ -108,11 +108,15 @@ public class TabouSolver implements Solver {
             }
 
             if(bestVoisin!=null){
+
                 sTaboo[bestVoisinT1][bestVoisinT2] = k + dureeTaboo;
 
                 currentSolution = bestVoisin.copy();
+
                 if(bestSolution.toSchedule().makespan() > bestVoisin.toSchedule().makespan()){
+
                     bestSolution = bestVoisin.copy();
+                    
                 }
             }
 

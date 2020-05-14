@@ -26,9 +26,9 @@ public class Main {
         GreedySolver gs2 = new GreedySolver();
         gs2.setPriority(1);
         DescentSolver dsSolve = new DescentSolver();
-        solvers.put("SPT", gs2);
-        solvers.put("ESP_LRPT", gs);
-        solvers.put("Descent", dsSolve);
+        //solvers.put("SPT", gs2);
+        //solvers.put("ESP_LRPT", gs);
+        //solvers.put("Descent", dsSolve);
         solvers.put("Tabou", new TabouSolver());
         // add new solvers here
     }
